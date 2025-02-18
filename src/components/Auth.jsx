@@ -1,42 +1,63 @@
 import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-// Import the image using a different syntax for Vite
 const fullLogo = new URL('../assets/logos/full.png', import.meta.url).href
 
 const AuthComponent = () => {
-  // Add effect to clear any existing sessions
   useEffect(() => {
+    // Clear any existing sessions on mount
     const clearExistingSession = async () => {
       try {
-        await supabase.auth.signOut();
+        // Remove any existing auth subscriptions
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+        subscription?.unsubscribe();
+
+        // Sign out and clear storage
+        await supabase.auth.signOut({ scope: 'global' });
+        
+        // Clear all storage
         localStorage.clear();
+        sessionStorage.clear();
+        
+        // Clear cookies
         document.cookie.split(";").forEach((c) => {
           document.cookie = c
             .replace(/^ +/, "")
             .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
         });
+        
         console.log('Cleared existing session and storage');
       } catch (error) {
         console.error('Error clearing session:', error);
       }
     };
-    
+
     clearExistingSession();
+
+    // Cleanup on unmount
+    return () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {});
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const handleGoogleSignIn = async () => {
     console.log('Starting auth flow...');
     try {
+      // Clear any existing state first
+      await supabase.auth.signOut({ scope: 'global' });
+
       const options = {
         provider: 'google',
         options: {
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent select_account',
+            prompt: 'select_account consent',
             hd: 'encorelm.com',
           },
           redirectTo: 'https://extra-services-meeting.vercel.app',
+          skipBrowserRedirect: false,
+          scopes: 'email profile',
         },
       };
       console.log('Auth options:', options);
@@ -46,14 +67,13 @@ const AuthComponent = () => {
 
       if (authError) throw authError;
 
-      // Add event listener for auth state changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      // Set up auth state change listener
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('Auth state changed:', { event, session });
         if (event === 'SIGNED_IN') {
           const userEmail = session?.user?.email;
           console.log('User signed in:', userEmail);
-          
-          // Check if user's email is in allowed_users table
+
           const { data: allowedUser, error: dbError } = await supabase
             .from('allowed_users')
             .select('*')
@@ -61,7 +81,7 @@ const AuthComponent = () => {
             .single();
 
           if (dbError || !allowedUser) {
-            // If not allowed, sign them out
+            subscription.unsubscribe();
             await supabase.auth.signOut();
             alert('Access denied. You are not authorized to access this application.');
           }
