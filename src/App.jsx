@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
-import BranchManagerMeeting from './components/BranchManagerMeeting'
+import ExtrasDepartmentMeeting from './components/ExtrasDepartmentMeeting'
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
           path="/" 
           element={
             <ProtectedRoute>
-              <BranchManagerMeeting />
+              <ExtrasDepartmentMeeting />
             </ProtectedRoute>
           } 
         />

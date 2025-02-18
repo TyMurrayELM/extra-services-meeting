@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Navigate } from 'react-router-dom'
-import AuthComponent from './Auth'  // Make sure this matches the file name exactly
+import AuthComponent from './Auth'
 
 const ProtectedRoute = ({ children }) => {
+  // For local development only - skip auth
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Development mode: Authentication bypassed');
+    return children;
+  }
+
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
