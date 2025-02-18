@@ -14,7 +14,7 @@ const AuthComponent = () => {
             prompt: 'select_account',
             hd: 'encorelm.com',
           },
-          redirectTo: window.location.origin,
+          redirectTo: 'https://extra-services-meeting.vercel.app',
         },
       });
   
