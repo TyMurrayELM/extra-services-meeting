@@ -1,29 +1,57 @@
+import { useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 // Import the image using a different syntax for Vite
 const fullLogo = new URL('../assets/logos/full.png', import.meta.url).href
 
 const AuthComponent = () => {
+  // Add effect to clear any existing sessions
+  useEffect(() => {
+    const clearExistingSession = async () => {
+      try {
+        await supabase.auth.signOut();
+        localStorage.clear();
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+        console.log('Cleared existing session and storage');
+      } catch (error) {
+        console.error('Error clearing session:', error);
+      }
+    };
+    
+    clearExistingSession();
+  }, []);
+
   const handleGoogleSignIn = async () => {
+    console.log('Starting auth flow...');
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithOAuth({
+      const options = {
         provider: 'google',
         options: {
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account',
+            prompt: 'consent select_account',
             hd: 'encorelm.com',
           },
           redirectTo: 'https://extra-services-meeting.vercel.app',
         },
-      });
-  
+      };
+      console.log('Auth options:', options);
+
+      const { data: authData, error: authError } = await supabase.auth.signInWithOAuth(options);
+      console.log('Auth response:', { authData, authError });
+
       if (authError) throw authError;
-  
+
       // Add event listener for auth state changes
       supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('Auth state changed:', { event, session });
         if (event === 'SIGNED_IN') {
           const userEmail = session?.user?.email;
+          console.log('User signed in:', userEmail);
           
           // Check if user's email is in allowed_users table
           const { data: allowedUser, error: dbError } = await supabase
@@ -31,7 +59,7 @@ const AuthComponent = () => {
             .select('*')
             .eq('email', userEmail)
             .single();
-  
+
           if (dbError || !allowedUser) {
             // If not allowed, sign them out
             await supabase.auth.signOut();
@@ -39,9 +67,9 @@ const AuthComponent = () => {
           }
         }
       });
-  
+
     } catch (error) {
-      console.error('Error during sign in:', error.message);
+      console.error('Error during sign in:', error);
       alert('An error occurred during sign in. Please try again.');
     }
   };
