@@ -881,14 +881,46 @@ const departments = [
 
 {/* Week Selector and User Profile */}
 <div className="flex items-center justify-between mb-6">
-  <div className="flex items-center gap-3">
-    <img 
-      src={agaveLogo} 
-      alt="Agave Logo" 
-      className="h-8 w-auto"
-    />
-    <h1 className="text-xl font-semibold">Extra Services Meeting Agenda</h1>
+  <div className="flex items-center gap-6">
+    <div className="flex items-center gap-3">
+      <img 
+        src={agaveLogo} 
+        alt="Agave Logo" 
+        className="h-8 w-auto"
+      />
+      <h1 className="text-xl font-semibold">Extra Services Meeting Agenda</h1>
+    </div>
+    
+    {/* Region Toggle */}
+    <div className="relative w-[200px] h-8">
+      <div className="absolute inset-0 flex rounded-full bg-gray-200">
+        <div
+          className={`absolute w-[100px] h-8 transition-transform duration-300 ease-in-out ${
+            selectedRegion === 'phoenix' ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="h-full w-full rounded-full bg-blue-500 shadow-md" />
+        </div>
+        <button
+          onClick={() => setSelectedRegion('phoenix')}
+          className={`relative z-10 flex-1 flex items-center justify-center text-sm font-medium transition-colors duration-200 ${
+            selectedRegion === 'phoenix' ? 'text-white' : 'text-gray-600'
+          }`}
+        >
+          Phoenix
+        </button>
+        <button
+          onClick={() => setSelectedRegion('lasvegas')}
+          className={`relative z-10 flex-1 flex items-center justify-center text-sm font-medium transition-colors duration-200 ${
+            selectedRegion === 'lasvegas' ? 'text-white' : 'text-gray-600'
+          }`}
+        >
+          Las Vegas
+        </button>
+      </div>
+    </div>
   </div>
+  
   <div className="flex items-center gap-4">
     <MonthProgress />
     <div className="relative min-w-[200px]">
