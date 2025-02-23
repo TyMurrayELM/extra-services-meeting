@@ -14,6 +14,8 @@ import _ from 'lodash';
 import sprayIcon from '../assets/icons/spray.png';
 import arborIcon from '../assets/icons/arbor.png';
 import enhancementsIcon from '../assets/icons/enhancements.png';
+const azIcon = new URL('../assets/icons/az.png', import.meta.url).href;
+const lvIcon = new URL('../assets/icons/lv.png', import.meta.url).href;
 
 import MonthProgress from './MonthProgress';
 
@@ -917,9 +919,15 @@ const departments = [
         </button>
       </div>
     </div>
-  </div>
+    </div>
   
   <div className="flex items-center gap-4">
+    {/* State Icon */}
+    <img 
+      src={selectedRegion === 'phoenix' ? new URL('../assets/icons/az.png', import.meta.url).href : new URL('../assets/icons/lv.png', import.meta.url).href}
+      alt={selectedRegion === 'phoenix' ? 'Arizona' : 'Las Vegas'}
+      className="h-8 w-auto"
+    />
     <MonthProgress />
     <div className="relative min-w-[200px]">
       <select 
