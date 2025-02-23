@@ -485,25 +485,16 @@ const meetingData = {
 
 // Add these new functions first
 const fetchKPIData = async (departmentId, date) => {
-  console.log('Starting fetchKPIData:', { departmentId, date });
-  
   try {
     const formattedDate = new Date(date).toISOString().split('T')[0];
-    console.log('Formatted date:', formattedDate);
-
+    
     const { data, error } = await supabase
       .from('kpi_entries')
       .select('*')
       .eq('meeting_type', MEETING_TYPE)
       .eq('department_id', departmentId)
+      .eq('region', selectedRegion)
       .eq('meeting_date', formattedDate);
-
-    console.log('Raw data from Supabase:', data); // Let's see what we're getting
-
-    if (error) {
-      console.error('Supabase error:', error);
-      throw error;
-    }
 
     if (!data || data.length === 0) {
       console.log('No existing data, creating initial entries');
@@ -511,6 +502,7 @@ const fetchKPIData = async (departmentId, date) => {
         metric.kpis.map(kpi => ({
           meeting_type: MEETING_TYPE,
           department_id: departmentId,
+          region: selectedRegion,  // Add region to new entries
           meeting_date: formattedDate,
           category: metric.category,
           kpi_name: kpi.name,
@@ -667,6 +659,7 @@ useEffect(() => {
           .select('*')
           .eq('meeting_type', MEETING_TYPE)
           .eq('department_id', selectedTab)
+          .eq('region', selectedRegion)  // Add region filter
           .eq('meeting_date', formattedDate);
 
         if (error) throw error;
@@ -676,13 +669,14 @@ useEffect(() => {
             metric.kpis.filter(kpi => kpi.name).map(kpi => ({
               meeting_type: MEETING_TYPE,
               department_id: selectedTab,
+              region: selectedRegion,  // Add region to new entries
               meeting_date: formattedDate,
               category: metric.category,
               kpi_name: kpi.name,
               target: kpi.target,
               actual: '',
               status: 'in-progress',
-              actions: '', // Ensure actions is initialized
+              actions: '',
               updated_at: new Date().toISOString()
             }))
           );
@@ -706,7 +700,7 @@ useEffect(() => {
 
     init();
   }
-}, [selectedTab, selectedDate]);
+}, [selectedTab, selectedDate, selectedRegion]); // Add selectedRegion to dependencies
 
 useEffect(() => {
   fetchFilesForDate(selectedDate);
@@ -758,6 +752,7 @@ const handleActualChange = async (mIndex, kIndex, newValue) => {
       })
       .eq('meeting_type', MEETING_TYPE)
       .eq('department_id', selectedTab)
+      .eq('region', selectedRegion)  // Add region filter
       .eq('meeting_date', formattedDate)
       .eq('category', metric.category)
       .eq('kpi_name', kpi.name);
@@ -781,8 +776,6 @@ const handleStatusChange = async (mIndex, kIndex, newValue) => {
     return;
   }
 
-
-  
   const metric = metricsData[mIndex];
   const kpi = metric.kpis[kIndex];
 
@@ -798,6 +791,7 @@ const handleStatusChange = async (mIndex, kIndex, newValue) => {
       })
       .eq('meeting_type', MEETING_TYPE)
       .eq('department_id', selectedTab)
+      .eq('region', selectedRegion)  // Add region filter
       .eq('meeting_date', new Date(selectedDate).toISOString().split('T')[0])
       .eq('category', metric.category)
       .eq('kpi_name', kpi.name);
@@ -814,7 +808,7 @@ const handleStatusChange = async (mIndex, kIndex, newValue) => {
 
 // Add this inside your component, near the top with other handler definitions
 const debouncedSaveActions = useMemo(
-  () => _.debounce(async (newValue, departmentId, date, category, kpiName) => {
+  () => _.debounce(async (newValue, departmentId, date, category, kpiName, region) => {  // Add region parameter
     try {
       const { data: { user } } = await supabase.auth.getUser();
       const formattedDate = new Date(date).toISOString().split('T')[0];
@@ -828,6 +822,7 @@ const debouncedSaveActions = useMemo(
         })
         .eq('meeting_type', MEETING_TYPE)
         .eq('department_id', departmentId)
+        .eq('region', region)  // Add region filter
         .eq('meeting_date', formattedDate)
         .eq('category', category)
         .eq('kpi_name', kpiName);
@@ -858,7 +853,8 @@ const handleActionsChange = (mIndex, kIndex, newValue) => {
     selectedTab,
     selectedDate,
     metric.category,
-    kpi.name
+    kpi.name,
+    selectedRegion  // Add region parameter
   );
 };
 
