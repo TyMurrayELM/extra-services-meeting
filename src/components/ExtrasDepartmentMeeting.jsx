@@ -880,15 +880,44 @@ const departments = [
         <div className="container mx-auto p-4 space-y-4">
 
 {/* Week Selector and User Profile */}
+{/* Week Selector and User Profile */}
 <div className="flex items-center justify-between mb-6">
-  <div className="flex items-center gap-3">
-    <img 
-      src={agaveLogo} 
-      alt="Agave Logo" 
-      className="h-8 w-auto"
-    />
-    <h1 className="text-xl font-semibold">Extra Services Meeting Agenda</h1>
+  <div className="flex items-center gap-6">
+    <div className="flex items-center gap-3">
+      <img 
+        src={agaveLogo} 
+        alt="Agave Logo" 
+        className="h-8 w-auto"
+      />
+      <h1 className="text-xl font-semibold">Extra Services Meeting Agenda</h1>
+    </div>
+    
+    {/* Region Toggle */}
+    <div className="relative inline-flex h-8 rounded-lg bg-gray-100 p-1">
+      <div
+        className={`absolute transition-transform duration-200 ease-in-out ${
+          selectedRegion === 'phoenix' ? 'translate-x-0' : 'translate-x-full'
+        } bg-white h-6 w-[72px] rounded-md shadow-sm`}
+      />
+      <button
+        onClick={() => setSelectedRegion('phoenix')}
+        className={`relative z-10 px-4 py-1 text-sm font-medium transition-colors duration-200 ${
+          selectedRegion === 'phoenix' ? 'text-gray-800' : 'text-gray-500'
+        }`}
+      >
+        Phoenix
+      </button>
+      <button
+        onClick={() => setSelectedRegion('lasvegas')}
+        className={`relative z-10 px-4 py-1 text-sm font-medium transition-colors duration-200 ${
+          selectedRegion === 'lasvegas' ? 'text-gray-800' : 'text-gray-500'
+        }`}
+      >
+        Las Vegas
+      </button>
+    </div>
   </div>
+  
   <div className="flex items-center gap-4">
     <MonthProgress />
     <div className="relative min-w-[200px]">
