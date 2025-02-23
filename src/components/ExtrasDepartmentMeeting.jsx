@@ -894,13 +894,15 @@ const departments = [
     {/* Region Toggle */}
     <div className="relative w-[200px] h-8">
       <div className="absolute inset-0 flex rounded-full bg-gray-200">
-        <div
-          className={`absolute w-[100px] h-8 transition-transform duration-300 ease-in-out ${
-            selectedRegion === 'phoenix' ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          <div className="h-full w-full rounded-full bg-blue-500 shadow-md" />
-        </div>
+      <div
+  className={`absolute w-[100px] h-8 transition-transform duration-300 ease-in-out ${
+    selectedRegion === 'phoenix' ? 'translate-x-0' : 'translate-x-full'
+  }`}
+>
+  <div className={`h-full w-full rounded-full shadow-md ${
+    selectedRegion === 'phoenix' ? 'bg-orange-600' : 'bg-yellow-600'
+  }`} />
+</div>
         <button
           onClick={() => setSelectedRegion('phoenix')}
           className={`relative z-10 flex-1 flex items-center justify-center text-sm font-medium transition-colors duration-200 ${
