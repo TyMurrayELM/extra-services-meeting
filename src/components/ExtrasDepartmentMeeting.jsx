@@ -926,7 +926,7 @@ const departments = [
     <img 
       src={selectedRegion === 'phoenix' ? new URL('../assets/icons/az.png', import.meta.url).href : new URL('../assets/icons/lv.png', import.meta.url).href}
       alt={selectedRegion === 'phoenix' ? 'Arizona' : 'Las Vegas'}
-      className="h-10 w-auto"
+      className="h-9 w-auto"
     />
     <MonthProgress />
     <div className="relative min-w-[200px]">
