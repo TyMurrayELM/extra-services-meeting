@@ -890,35 +890,35 @@ const departments = [
     <h1 className="text-xl font-semibold">Extra Services Meeting Agenda</h1>
   </div>
   <div className="flex items-center gap-4">
-    {/* Add Region Toggle */}
-    <div className="bg-white rounded-lg p-1 shadow-sm border border-gray-200">
-      <button
-        onClick={() => setSelectedRegion('phoenix')}
-        className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${
-          selectedRegion === 'phoenix'
-            ? 'bg-blue-500 text-white'
-            : 'hover:bg-gray-100 text-gray-600'
-        }`}
-      >
-        Phoenix
-      </button>
-      <button
-        onClick={() => setSelectedRegion('lasvegas')}
-        className={`px-4 py-2 rounded-md flex items-center gap-2 transition-colors ${
-          selectedRegion === 'lasvegas'
-            ? 'bg-blue-500 text-white'
-            : 'hover:bg-gray-100 text-gray-600'
-        }`}
-      >
-        Las Vegas
-      </button>
-    </div>
     <MonthProgress />
     <div className="relative min-w-[200px]">
-      {/* Date selector remains the same */}
+      <select 
+        value={selectedDate}
+        onChange={(e) => setSelectedDate(e.target.value)}
+        className="w-full appearance-none bg-white border border-gray-300 rounded-lg py-2.5 px-4 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-700"
+      >
+        {dates.map(date => (
+          <option key={date} value={date}>
+            {date}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path clipRule="evenodd" fillRule="evenodd" d="M10 12l-5-5h10l-5 5z" />
+        </svg>
+      </div>
     </div>
     <div className="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 shadow-sm">
-      {/* User info remains the same */}
+      <User className="w-5 h-5 text-gray-500 mr-2" />
+      <span className="text-sm text-gray-700">{user?.email}</span>
+      <button 
+        onClick={() => supabase.auth.signOut()} 
+        className="ml-2 p-1 hover:bg-gray-100 rounded-full"
+        title="Sign out"
+      >
+        <LogOut className="w-4 h-4 text-gray-500" />
+      </button>
     </div>
   </div>
 </div>
