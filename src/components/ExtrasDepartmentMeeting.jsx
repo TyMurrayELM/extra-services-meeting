@@ -6,7 +6,7 @@ import {
   CardContent 
 } from './ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
-import { Check, AlertTriangle, Timer, LogOut, User } from 'lucide-react';
+import { Check, AlertTriangle, Timer, LogOut, User, Info } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import _ from 'lodash';
 // Keep your existing icon imports
@@ -1200,8 +1200,19 @@ const departments = [
             {metric.category === 'People, Learning & Growth' && "Strategic Objective: Increase employee retention, Upskill employees and Develop our safety culture"}
           </div>
         </td>
-        <td className="px-4 py-2 align-top">
-  <div className="font-medium">{kpi.name}</div>
+<td className="px-4 py-2 align-top">
+  <div className="font-medium flex items-center gap-1">
+    {kpi.name}
+    {kpi.name === 'Hours Effeciency Metric' && (
+      <div className="relative group">
+        <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-20">
+          Based on hours worked, how close is revenue to our hourly rate x hours worked?
+          <div className="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
+        </div>
+      </div>
+    )}
+  </div>
   {kpi.explanation && (
     <div className="text-xs text-gray-500 mt-1 pr-2">
       {kpi.explanation}
