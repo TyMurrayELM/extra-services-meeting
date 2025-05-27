@@ -1157,9 +1157,9 @@ const departments = [
     <h2 className="text-lg font-semibold text-white">Strategic Objectives & KPIs</h2>
   </div>
   <div className="bg-white p-4">
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
                   <table className="w-full border-collapse">
-                  <thead>
+                  <thead className="sticky top-0 bg-white z-10">
                   <tr className="border-b border-gray-200">
   <th className="px-4 py-2 text-left font-semibold w-40">Category</th>
   <th className="px-4 py-2 text-left font-semibold w-48">KPI</th>
@@ -1215,7 +1215,7 @@ const departments = [
             value={kpi.actual || ''}
             onChange={(e) => handleActualChange(mIndex, kIndex, e.target.value)}
             placeholder="..."
-            className="w-full px-1 py-1 bg-transparent hover:bg-gray-50 focus:bg-white focus:border focus:rounded-md focus:outline-none text-xs"
+            className="w-full px-1 py-1 bg-white border-2 border-black rounded-md hover:bg-gray-50 focus:bg-white focus:border-2 focus:border-black focus:outline-none text-xs text-center"
           />
         </td>
         <td className="px-4 py-2 align-top">
@@ -1237,7 +1237,7 @@ const departments = [
     value={kpi.actions || ''}
     onChange={(e) => handleActionsChange(mIndex, kIndex, e.target.value)}
     placeholder="Enter actions & deadlines..."
-    className="w-full px-3 py-2 bg-transparent hover:bg-gray-50 focus:bg-white focus:border focus:rounded-md focus:outline-none resize-none"
+    className="w-full px-3 py-2 bg-white border-2 border-black rounded-md hover:bg-gray-50 focus:bg-white focus:border-2 focus:border-black focus:outline-none resize-none"
     style={{
       height: '5rem',
       overflowY: 'auto'
