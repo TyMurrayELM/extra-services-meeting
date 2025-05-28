@@ -513,8 +513,8 @@ const meetingData = {
       category: 'Client',
       kpis: [
         {
-          name: 'Frequency of Proposals',
-          explanation: 'Increase efficiencies, lower cost and improve quality',
+          name: 'Proposal Targets and Deadlines being Met',
+          explanation: 'Proposal Requests on time, budgeted effort proposed, proposal $\'s being met',
           target: '-',
           actual: '',
           status: '',
