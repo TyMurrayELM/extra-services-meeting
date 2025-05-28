@@ -17,10 +17,25 @@ import enhancementsIcon from '../assets/icons/enhancements.png';
 const azIcon = new URL('../assets/icons/az.png', import.meta.url).href;
 const lvIcon = new URL('../assets/icons/lv.png', import.meta.url).href;
 
+// Branch icon imports for rich text editor
+import seIcon from '../assets/icons/se.png';
+import nIcon from '../assets/icons/n.png';
+import swIcon from '../assets/icons/sw.png';
+import irrIcon from '../assets/icons/irr.png';
+
 import MonthProgress from './MonthProgress';
 
 // Add this constant at the top of your component
 const MEETING_TYPE = 'extras-meeting';
+
+// Create branch icons mapping
+const branchIcons = {
+  'SE': seIcon,
+  'N': nIcon,
+  'SW': swIcon,
+  'LV': lvIcon,
+  'IRR': irrIcon
+};
 
 // Custom hook for auto-resizing textareas
 const useAutoResizeTextarea = (value) => {
@@ -40,7 +55,7 @@ const useAutoResizeTextarea = (value) => {
   return textareaRef;
 };
 
-// Simple markdown parser for bold, italic, and lists
+// Enhanced markdown parser with icon support
 const parseMarkdown = (text) => {
   if (!text) return '';
   
@@ -61,14 +76,26 @@ const parseMarkdown = (text) => {
     .replace(/__(.+?)__/g, '<strong>$1</strong>')
     // Italic: *text* or _text_
     .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
-    .replace(/_([^_\n]+)_/g, '<em>$1</em>')
-    // Line breaks (do this LAST)
-    .replace(/\n/g, '<br />');
+    .replace(/_([^_\n]+)_/g, '<em>$1</em>');
+    
+  // Process icons - replace :ICON: or [ICON] syntax with img tags
+  Object.entries(branchIcons).forEach(([key, iconSrc]) => {
+    // Support both :ICON: and [ICON] syntax
+    const colonPattern = new RegExp(`:${key}:`, 'g');
+    const bracketPattern = new RegExp(`\\[${key}\\]`, 'g');
+    
+    html = html
+      .replace(colonPattern, `<img src="${iconSrc}" alt="${key}" style="height: 18px; width: auto; display: inline-block; vertical-align: middle; margin: 0 2px;" />`)
+      .replace(bracketPattern, `<img src="${iconSrc}" alt="${key}" style="height: 18px; width: auto; display: inline-block; vertical-align: middle; margin: 0 2px;" />`);
+  });
+  
+  // Line breaks (do this LAST)
+  html = html.replace(/\n/g, '<br />');
     
   return html;
 };
 
-// Rich Text Actions component
+// Enhanced Rich Text Actions component with icon support
 const RichTextActions = ({ value, onChange, placeholder }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value || '');
@@ -108,6 +135,31 @@ const RichTextActions = ({ value, onChange, placeholder }) => {
     setTimeout(() => {
       textarea.focus();
       const newCursorPos = selectedText ? end + prefix.length + suffix.length : start + prefix.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+  
+  // New function to insert icons
+  const insertIcon = (iconKey) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = localValue;
+    const iconSyntax = `:${iconKey}:`;
+    
+    const newText = 
+      text.substring(0, start) + 
+      iconSyntax + 
+      text.substring(end);
+    
+    setLocalValue(newText);
+    
+    // Restore cursor position after icon
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + iconSyntax.length;
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
   };
@@ -158,6 +210,25 @@ const RichTextActions = ({ value, onChange, placeholder }) => {
         >
           • List
         </button>
+        <div className="border-l border-gray-300 mx-1" />
+        
+        {/* Icon buttons */}
+        {Object.entries(branchIcons).map(([key, iconSrc]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => insertIcon(key)}
+            className="px-1 py-1 hover:bg-gray-200 rounded flex items-center justify-center"
+            title={`Insert ${key} branch icon`}
+          >
+            <img 
+              src={iconSrc} 
+              alt={key} 
+              className="h-4 w-4"
+            />
+          </button>
+        ))}
+        
         <div className="flex-1" />
         <button
           type="button"
@@ -187,7 +258,7 @@ const RichTextActions = ({ value, onChange, placeholder }) => {
         }}
       />
       <div className="text-xs text-gray-500 mt-1">
-        Tip: Use **text** for bold, *text* for italic, - for bullet points
+        Tip: Use **text** for bold, *text* for italic, - for bullet points, :SE: or [SE] for branch icons
       </div>
     </div>
   );
