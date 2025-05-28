@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Card, 
   CardHeader, 
@@ -21,6 +21,177 @@ import MonthProgress from './MonthProgress';
 
 // Add this constant at the top of your component
 const MEETING_TYPE = 'extras-meeting';
+
+// Custom hook for auto-resizing textareas
+const useAutoResizeTextarea = (value) => {
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set the height to the scrollHeight (content height)
+      // Math.min ensures it doesn't exceed maxHeight (20rem = 320px)
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 320)}px`;
+    }
+  }, [value]); // Re-calculate when value changes
+
+  return textareaRef;
+};
+
+// Simple markdown parser for bold, italic, and lists
+const parseMarkdown = (text) => {
+  if (!text) return '';
+  
+  // Convert markdown to HTML
+  let html = text
+    // Bold: **text** or __text__
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<strong>$1</strong>')
+    // Italic: *text* or _text_
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/_(.+?)_/g, '<em>$1</em>')
+    // Line breaks
+    .replace(/\n/g, '<br />')
+    // Bullet points: - item
+    .replace(/^- (.+)$/gm, '• $1')
+    // Numbered lists: 1. item
+    .replace(/^\d+\. (.+)$/gm, (match, p1, offset, string) => {
+      const lines = string.substring(0, offset).split('\n');
+      const currentLineIndex = lines.length;
+      const prevLine = lines[currentLineIndex - 2];
+      const isFirstNumberedItem = !prevLine || !/^\d+\./.test(prevLine);
+      return `${isFirstNumberedItem ? '<br />' : ''}${match}`;
+    });
+    
+  return html;
+};
+
+// Rich Text Actions component
+const RichTextActions = ({ value, onChange, placeholder }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [localValue, setLocalValue] = useState(value || '');
+  const textareaRef = useAutoResizeTextarea(localValue);
+  
+  useEffect(() => {
+    setLocalValue(value || '');
+  }, [value]);
+  
+  const handleSave = () => {
+    onChange({ target: { value: localValue } });
+    setIsEditing(false);
+  };
+  
+  const handleCancel = () => {
+    setLocalValue(value || '');
+    setIsEditing(false);
+  };
+  
+  const insertFormatting = (prefix, suffix = prefix) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = localValue;
+    const selectedText = text.substring(start, end);
+    
+    const newText = 
+      text.substring(0, start) + 
+      prefix + selectedText + suffix + 
+      text.substring(end);
+    
+    setLocalValue(newText);
+    
+    // Restore cursor position
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = selectedText ? end + prefix.length + suffix.length : start + prefix.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+  
+  if (!isEditing) {
+    return (
+      <div 
+        className="w-full px-3 py-2 bg-white border border-black rounded-md min-h-[5rem] max-h-[20rem] overflow-y-auto cursor-pointer hover:bg-gray-50"
+        onClick={() => setIsEditing(true)}
+      >
+        {localValue ? (
+          <div 
+            className="prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ __html: parseMarkdown(localValue) }}
+          />
+        ) : (
+          <span className="text-gray-400">{placeholder}</span>
+        )}
+      </div>
+    );
+  }
+  
+  return (
+    <div className="w-full">
+      <div className="flex gap-1 mb-1 p-1 bg-gray-100 rounded-t-md border border-b-0 border-black">
+        <button
+          type="button"
+          onClick={() => insertFormatting('**')}
+          className="px-2 py-1 text-sm font-bold hover:bg-gray-200 rounded"
+          title="Bold (** text **)"
+        >
+          B
+        </button>
+        <button
+          type="button"
+          onClick={() => insertFormatting('*')}
+          className="px-2 py-1 text-sm italic hover:bg-gray-200 rounded"
+          title="Italic (* text *)"
+        >
+          I
+        </button>
+        <div className="border-l border-gray-300 mx-1" />
+        <button
+          type="button"
+          onClick={() => insertFormatting('- ', '')}
+          className="px-2 py-1 text-sm hover:bg-gray-200 rounded"
+          title="Bullet point"
+        >
+          • List
+        </button>
+        <div className="flex-1" />
+        <button
+          type="button"
+          onClick={handleSave}
+          className="px-3 py-1 text-sm bg-green-500 text-white hover:bg-green-600 rounded"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="px-3 py-1 text-sm bg-gray-300 hover:bg-gray-400 rounded"
+        >
+          Cancel
+        </button>
+      </div>
+      <textarea
+        ref={textareaRef}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        placeholder={placeholder}
+        className="w-full px-3 py-2 bg-white border border-black hover:bg-gray-50 focus:bg-white focus:border rounded-b-md focus:outline-none resize-y"
+        style={{
+          minHeight: '5rem',
+          maxHeight: '20rem',
+          overflowY: 'auto'
+        }}
+      />
+      <div className="text-xs text-gray-500 mt-1">
+        Tip: Use **text** for bold, *text* for italic, - for bullet points
+      </div>
+    </div>
+  );
+};
 
 const BranchManagerMeeting = () => {
   const renderStatusOption = (status) => {
@@ -1244,17 +1415,13 @@ const departments = [
           </select>
         </td>
         <td className="px-4 py-2">
-  <textarea
-    value={kpi.actions || ''}
-    onChange={(e) => handleActionsChange(mIndex, kIndex, e.target.value)}
-    placeholder="Enter actions & deadlines..."
-    className="w-full px-3 py-2 bg-white border border-black rounded-md hover:bg-gray-50 focus:bg-white focus:border-2 focus:border-black focus:outline-none resize-none"
-    style={{
-      height: '5rem',
-      overflowY: 'auto'
-    }}
-  />
-</td>
+          {/* RICH TEXT EDITOR FOR ACTIONS & DEADLINES */}
+          <RichTextActions
+            value={kpi.actions || ''}
+            onChange={(e) => handleActionsChange(mIndex, kIndex, e.target.value)}
+            placeholder="Enter actions & deadlines..."
+          />
+        </td>
       </tr>
     ))
   ))}
