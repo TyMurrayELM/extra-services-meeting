@@ -531,7 +531,7 @@ const meetingData = {
           actions: ''
         },
         {
-          name: 'Following full Process & Job Completion Follow-up',
+          name: 'Execution, External and Completion Process Adherence',
           explanation: '',
           target: '-',
           actual: '',
@@ -605,7 +605,7 @@ const meetingData = {
       category: 'Internal',
       kpis: [
         {
-          name: 'Process follow through',
+          name: 'Internal Process follow-through and Communication',
           explanation: 'Process follow through and game plan before job starts',
           target: '100% process following',
           actual: '',
