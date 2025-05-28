@@ -537,8 +537,8 @@ const meetingData = {
           actions: ''
         },
         {
-          name: '',
-          explanation: '',
+          name: 'Open Opportunities',
+          explanation: 'Identify Long-aged Jobs that need addressing or statusing',
           target: '-',
           actual: '',
           status: '',
@@ -585,6 +585,14 @@ const meetingData = {
           name: 'Gross Margin',
           explanation: 'How are we performing and estimating the work?',
           target: '70%',
+          actual: '',
+          status: '',
+          actions: ''
+        },
+        {
+          name: 'Backlog',
+          explanation: 'How far out are we scheduled at current crew sizing?',
+          target: '-',
           actual: '',
           status: '',
           actions: ''
