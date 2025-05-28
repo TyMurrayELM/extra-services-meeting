@@ -267,6 +267,8 @@ const BranchManagerMeeting = () => {
     switch (status) {
       case 'on-track':
         return <div className="flex items-center gap-2"><Check className="text-green-500" /> On Track</div>;
+      case 'all-good':
+        return <div className="flex items-center gap-2"><Check className="text-green-600" /> All Good</div>;
       case 'resolving':
         return <div className="flex items-center gap-2"><Timer className="text-yellow-500" /> Resolving</div>;
       case 'in-progress':
@@ -1497,6 +1499,7 @@ const departments = [
             }`}
           >
             <option value="">Select a status...</option>
+            <option value="all-good">👍 All Good</option>
             <option value="on-track">✅ On Track</option>
             <option value="resolving">⏳ Resolving</option>
             <option value="in-progress">🔄 In Progress</option>
