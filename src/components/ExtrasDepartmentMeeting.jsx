@@ -749,6 +749,7 @@ const fetchKPIData = async (departmentId, date) => {
           category: metric.category,
           kpi_name: kpi.name,
           target: kpi.target,
+          explanation: kpi.explanation || '',  // Add explanation field
           actual: '',
           status: 'in-progress',
           actions: ''
@@ -807,13 +808,18 @@ const transformKPIData = (data) => {
       acc[entry.category] = { category: entry.category, kpis: [] };
     }
 
+    // Find the explanation from meetingData
+    const matchingMetric = meetingData.metrics.find(m => m.category === entry.category);
+    const matchingKpi = matchingMetric?.kpis.find(k => k.name === entry.kpi_name);
+    const explanation = matchingKpi?.explanation || entry.explanation || '';
+
     acc[entry.category].kpis.push({
       name: entry.kpi_name,
       target: entry.target || '',
       actual: entry.actual || '',
       status: entry.status || '',
       actions: entry.actions || '', // Ensure actions is always defined
-      explanation: entry.explanation || ''
+      explanation: explanation
     });
     return acc;
   }, {});
@@ -875,6 +881,7 @@ const addNewFinancialKPI = async (departmentId, date) => {
           category: 'Financial',
           kpi_name: 'Maintenance Direct Labor Cost (DL%) - Onsites',
           target: '55%',
+          explanation: 'Direct labor costs as percentage of maintenance revenue',  // Add explanation
           actual: '',
           status: 'in-progress',
           actions: ''
@@ -916,6 +923,7 @@ useEffect(() => {
               category: metric.category,
               kpi_name: kpi.name,
               target: kpi.target,
+              explanation: kpi.explanation || '',  // Add explanation field
               actual: '',
               status: 'in-progress',
               actions: '',
