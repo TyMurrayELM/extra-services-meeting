@@ -275,6 +275,8 @@ const BranchManagerMeeting = () => {
         return <div className="flex items-center gap-2"><Timer className="text-purple-500" /> In Training</div>;
       case 'off-track':
         return <div className="flex items-center gap-2"><AlertTriangle className="text-red-500" /> Off Track</div>;
+      case 'serious-issue':
+        return <div className="flex items-center gap-2"><AlertTriangle className="text-red-700 animate-pulse" /> Serious Issue</div>;
       case '':
         return <div className="text-gray-400">Status needed</div>;
       default:
@@ -522,7 +524,7 @@ const meetingData = {
         },
         {
           name: 'Follow up on Proposals',
-          explanation: 'Review vehicle and equipment needs or issues',
+          explanation: 'Follow-ups Scheduled for all proposals and proper pipeline management',
           target: '-',
           actual: '',
           status: '',
@@ -1489,7 +1491,10 @@ const departments = [
           <select 
             value={kpi.status}
             onChange={(e) => handleStatusChange(mIndex, kIndex, e.target.value)}
-            className="flex items-center w-full px-3 py-2 border rounded-md bg-white"
+            className={`flex items-center w-full px-3 py-2 border rounded-md bg-white ${
+              kpi.status === 'serious-issue' ? 'border-red-700 bg-red-50 animate-pulse' : 
+              kpi.status === 'off-track' ? 'border-red-500' : ''
+            }`}
           >
             <option value="">Select a status...</option>
             <option value="on-track">✅ On Track</option>
@@ -1497,6 +1502,7 @@ const departments = [
             <option value="in-progress">🔄 In Progress</option>
             <option value="in-training">📚 In Training</option>
             <option value="off-track">⚠️ Off Track</option>
+            <option value="serious-issue">🚨 Serious Issue</option>
           </select>
         </td>
         <td className="px-4 py-2">
