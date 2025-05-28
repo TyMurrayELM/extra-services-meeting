@@ -44,26 +44,26 @@ const useAutoResizeTextarea = (value) => {
 const parseMarkdown = (text) => {
   if (!text) return '';
   
-  // Convert markdown to HTML
-  let html = text
+  // First, handle bullet points and store them
+  const lines = text.split('\n');
+  const processedLines = lines.map(line => {
+    // Check if line starts with "- "
+    if (line.startsWith('- ')) {
+      return '• ' + line.substring(2);
+    }
+    return line;
+  });
+  
+  // Join lines back and process other markdown
+  let html = processedLines.join('\n')
     // Bold: **text** or __text__
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/__(.+?)__/g, '<strong>$1</strong>')
     // Italic: *text* or _text_
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-    // Line breaks
-    .replace(/\n/g, '<br />')
-    // Bullet points: - item
-    .replace(/^- (.+)$/gm, '• $1')
-    // Numbered lists: 1. item
-    .replace(/^\d+\. (.+)$/gm, (match, p1, offset, string) => {
-      const lines = string.substring(0, offset).split('\n');
-      const currentLineIndex = lines.length;
-      const prevLine = lines[currentLineIndex - 2];
-      const isFirstNumberedItem = !prevLine || !/^\d+\./.test(prevLine);
-      return `${isFirstNumberedItem ? '<br />' : ''}${match}`;
-    });
+    .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')
+    .replace(/_([^_\n]+)_/g, '<em>$1</em>')
+    // Line breaks (do this LAST)
+    .replace(/\n/g, '<br />');
     
   return html;
 };
