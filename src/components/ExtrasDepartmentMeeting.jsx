@@ -21,7 +21,6 @@ const lvIcon = new URL('../assets/icons/lv.png', import.meta.url).href;
 import seIcon from '../assets/icons/se.png';
 import nIcon from '../assets/icons/n.png';
 import swIcon from '../assets/icons/sw.png';
-import irrIcon from '../assets/icons/irr.png';
 
 import MonthProgress from './MonthProgress';
 
@@ -33,8 +32,7 @@ const branchIcons = {
   'SE': seIcon,
   'N': nIcon,
   'SW': swIcon,
-  'LV': lvIcon,
-  'IRR': irrIcon
+  'LV': lvIcon
 };
 
 // Custom hook for auto-resizing textareas
