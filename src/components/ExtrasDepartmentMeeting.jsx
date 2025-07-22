@@ -682,7 +682,7 @@ const meetingData = {
         {
           name: 'Hiring Needs',
           target: '-', // Default target, will be overridden by department/region
-          explanation: 'Target headcount for the department',
+          explanation: 'Target headcount for this department to hit revenue goals',
           actual: '',
           status: '',
           actions: ''
@@ -1545,7 +1545,7 @@ const departments = [
       <div className="relative group">
         <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
         <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-20">
-          Target headcount for this department and region
+          Target headcount for this department to hit revenue goals
           <div className="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
         </div>
       </div>
