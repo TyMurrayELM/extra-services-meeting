@@ -27,6 +27,13 @@ import MonthProgress from './MonthProgress';
 // Add this constant at the top of your component
 const MEETING_TYPE = 'extras-meeting';
 
+// Department-specific OT % targets
+const OT_TARGETS = {
+  'spray': '< 5%',
+  'arbor': '< 5%',
+  'enhancements': '< 0.5%'
+};
+
 // Create branch icons mapping
 const branchIcons = {
   'SE': seIcon,
@@ -604,7 +611,7 @@ const meetingData = {
         {
           name: 'OT %',
           explanation: 'Overtime percentage - tracking overtime hours as a percentage of total hours worked',
-          target: '< 10%',
+          target: '< 10%', // Default target, will be overridden by department
           actual: '',
           status: '',
           actions: ''
@@ -761,19 +768,27 @@ const fetchKPIData = async (departmentId, date) => {
     if (!data || data.length === 0) {
       console.log('No existing data, creating initial entries');
       const initialEntries = meetingData.metrics.flatMap(metric => 
-        metric.kpis.map(kpi => ({
-          meeting_type: MEETING_TYPE,
-          department_id: departmentId,
-          region: selectedRegion,  // Add region to new entries
-          meeting_date: formattedDate,
-          category: metric.category,
-          kpi_name: kpi.name,
-          target: kpi.target,
-          explanation: kpi.explanation || '',  // Add explanation field
-          actual: '',
-          status: 'in-progress',
-          actions: ''
-        }))
+        metric.kpis.map(kpi => {
+          // Use department-specific target for OT %
+          let target = kpi.target;
+          if (kpi.name === 'OT %' && OT_TARGETS[departmentId]) {
+            target = OT_TARGETS[departmentId];
+          }
+          
+          return {
+            meeting_type: MEETING_TYPE,
+            department_id: departmentId,
+            region: selectedRegion,  // Add region to new entries
+            meeting_date: formattedDate,
+            category: metric.category,
+            kpi_name: kpi.name,
+            target: target,
+            explanation: kpi.explanation || '',  // Add explanation field
+            actual: '',
+            status: 'in-progress',
+            actions: ''
+          };
+        })
       );
 
       // Let's check for duplicates in what we're about to insert
@@ -935,20 +950,28 @@ useEffect(() => {
 
         if (!data || data.length === 0) {
           const initialEntries = meetingData.metrics.flatMap(metric => 
-            metric.kpis.filter(kpi => kpi.name).map(kpi => ({
-              meeting_type: MEETING_TYPE,
-              department_id: selectedTab,
-              region: selectedRegion,  // Add region to new entries
-              meeting_date: formattedDate,
-              category: metric.category,
-              kpi_name: kpi.name,
-              target: kpi.target,
-              explanation: kpi.explanation || '',  // Add explanation field
-              actual: '',
-              status: 'in-progress',
-              actions: '',
-              updated_at: new Date().toISOString()
-            }))
+            metric.kpis.filter(kpi => kpi.name).map(kpi => {
+              // Use department-specific target for OT %
+              let target = kpi.target;
+              if (kpi.name === 'OT %' && OT_TARGETS[selectedTab]) {
+                target = OT_TARGETS[selectedTab];
+              }
+              
+              return {
+                meeting_type: MEETING_TYPE,
+                department_id: selectedTab,
+                region: selectedRegion,  // Add region to new entries
+                meeting_date: formattedDate,
+                category: metric.category,
+                kpi_name: kpi.name,
+                target: target,
+                explanation: kpi.explanation || '',  // Add explanation field
+                actual: '',
+                status: 'in-progress',
+                actions: '',
+                updated_at: new Date().toISOString()
+              };
+            })
           );
 
           const { data: newData, error: insertError } = await supabase
