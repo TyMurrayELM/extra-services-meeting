@@ -600,6 +600,14 @@ const meetingData = {
           actual: '',
           status: '',
           actions: ''
+        },
+        {
+          name: 'OT %',
+          explanation: 'Overtime percentage - tracking overtime hours as a percentage of total hours worked',
+          target: '< 10%',
+          actual: '',
+          status: '',
+          actions: ''
         }
       ]
     },
