@@ -41,6 +41,20 @@ const OT_TARGETS = {
   }
 };
 
+// Department and region-specific headcount targets
+const HEADCOUNT_TARGETS = {
+  'phoenix': {
+    'spray': '3',
+    'arbor': '23',
+    'enhancements': '10'
+  },
+  'lasvegas': {
+    'spray': '1',
+    'arbor': '6',
+    'enhancements': '3'
+  }
+};
+
 // Create branch icons mapping
 const branchIcons = {
   'SE': seIcon,
@@ -667,8 +681,8 @@ const meetingData = {
       kpis: [
         {
           name: 'Hiring Needs',
-          target: 'Fill critical positions',
-          explanation: 'Identify any employee needs',
+          target: '-', // Default target, will be overridden by department/region
+          explanation: 'Target headcount for the department',
           actual: '',
           status: '',
           actions: ''
@@ -780,6 +794,10 @@ const fetchKPIData = async (departmentId, date) => {
           let target = kpi.target;
           if (kpi.name === 'OT %' && OT_TARGETS[selectedRegion] && OT_TARGETS[selectedRegion][departmentId]) {
             target = OT_TARGETS[selectedRegion][departmentId];
+          }
+          // Use department and region-specific target for Hiring Needs
+          if (kpi.name === 'Hiring Needs' && HEADCOUNT_TARGETS[selectedRegion] && HEADCOUNT_TARGETS[selectedRegion][departmentId]) {
+            target = HEADCOUNT_TARGETS[selectedRegion][departmentId];
           }
           
           return {
@@ -962,6 +980,10 @@ useEffect(() => {
               let target = kpi.target;
               if (kpi.name === 'OT %' && OT_TARGETS[selectedRegion] && OT_TARGETS[selectedRegion][selectedTab]) {
                 target = OT_TARGETS[selectedRegion][selectedTab];
+              }
+              // Use department and region-specific target for Hiring Needs
+              if (kpi.name === 'Hiring Needs' && HEADCOUNT_TARGETS[selectedRegion] && HEADCOUNT_TARGETS[selectedRegion][selectedTab]) {
+                target = HEADCOUNT_TARGETS[selectedRegion][selectedTab];
               }
               
               return {
@@ -1515,6 +1537,15 @@ const departments = [
         <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
         <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-20">
           Can be found on Encore Dashboard when filtered on Region & Department
+          <div className="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
+        </div>
+      </div>
+    )}
+    {kpi.name === 'Hiring Needs' && (
+      <div className="relative group">
+        <Info className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" />
+        <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-20">
+          Target headcount for this department and region
           <div className="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-800"></div>
         </div>
       </div>
