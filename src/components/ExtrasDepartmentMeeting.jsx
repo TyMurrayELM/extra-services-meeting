@@ -27,11 +27,18 @@ import MonthProgress from './MonthProgress';
 // Add this constant at the top of your component
 const MEETING_TYPE = 'extras-meeting';
 
-// Department-specific OT % targets
+// Department and region-specific OT % targets
 const OT_TARGETS = {
-  'spray': '< 5%',
-  'arbor': '< 5%',
-  'enhancements': '< 0.5%'
+  'phoenix': {
+    'spray': '< 5%',
+    'arbor': '< 5%',
+    'enhancements': '< 0.5%'
+  },
+  'lasvegas': {
+    'spray': '0%',
+    'arbor': '< 1%',
+    'enhancements': '0%'
+  }
 };
 
 // Create branch icons mapping
@@ -769,10 +776,10 @@ const fetchKPIData = async (departmentId, date) => {
       console.log('No existing data, creating initial entries');
       const initialEntries = meetingData.metrics.flatMap(metric => 
         metric.kpis.map(kpi => {
-          // Use department-specific target for OT %
+          // Use department and region-specific target for OT %
           let target = kpi.target;
-          if (kpi.name === 'OT %' && OT_TARGETS[departmentId]) {
-            target = OT_TARGETS[departmentId];
+          if (kpi.name === 'OT %' && OT_TARGETS[selectedRegion] && OT_TARGETS[selectedRegion][departmentId]) {
+            target = OT_TARGETS[selectedRegion][departmentId];
           }
           
           return {
@@ -951,10 +958,10 @@ useEffect(() => {
         if (!data || data.length === 0) {
           const initialEntries = meetingData.metrics.flatMap(metric => 
             metric.kpis.filter(kpi => kpi.name).map(kpi => {
-              // Use department-specific target for OT %
+              // Use department and region-specific target for OT %
               let target = kpi.target;
-              if (kpi.name === 'OT %' && OT_TARGETS[selectedTab]) {
-                target = OT_TARGETS[selectedTab];
+              if (kpi.name === 'OT %' && OT_TARGETS[selectedRegion] && OT_TARGETS[selectedRegion][selectedTab]) {
+                target = OT_TARGETS[selectedRegion][selectedTab];
               }
               
               return {
