@@ -61,10 +61,11 @@ const updateKpiField = (metrics, mIndex, kIndex, field, value) =>
   );
 
 const CATEGORY_ORDER = {
-  'Financial': 1,
-  'Client': 2,
-  'Internal': 3,
-  'People, Learning & Growth': 4
+  'Financial - Revenue': 1,
+  'Financial': 2,
+  'Client': 3,
+  'Internal': 4,
+  'People, Learning & Growth': 5
 };
 
 const sortByCategory = (a, b) => (CATEGORY_ORDER[a.category] || 999) - (CATEGORY_ORDER[b.category] || 999);
@@ -282,7 +283,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Proposal Targets and Deadlines being Met',
             explanation: 'Proposal Requests on time, budgeted effort proposed, proposal $\'s being met',
-            target: '-',
+            target: '0',
             actual: '',
             status: '',
             actions: ''
@@ -290,7 +291,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Follow up on Proposals',
             explanation: 'Follow-ups Scheduled for all proposals and proper pipeline management',
-            target: '-',
+            target: '0',
             actual: '',
             status: '',
             actions: ''
@@ -306,7 +307,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Open Opportunities',
             explanation: 'Identify Long-aged Jobs that need addressing or statusing',
-            target: '-',
+            target: '0',
             actual: '',
             status: '',
             actions: ''
@@ -322,20 +323,20 @@ const BranchManagerMeeting = () => {
         ]
       },
       {
-        category: 'Financial',
+        category: 'Financial - Revenue',
         kpis: [
           {
             name: 'Revenue vs. Goal',
             explanation: 'Invoiced revenue which is directly driven by how much work has been completed over the course of the month ',
-            target: '100%',
+            target: '',
             actual: '',
             status: '',
             actions: ''
           },
           {
-            name: 'Sales vs. Goal',
-            explanation: 'How well we are filling the backlog and getting new work approved',
-            target: '100%',
+            name: 'Required FTEs to Hit Goal',
+            explanation: '⭐ Without the required FTEs, the revenue goal cannot be achieved ⭐',
+            target: '-',
             actual: '',
             status: '',
             actions: ''
@@ -344,6 +345,27 @@ const BranchManagerMeeting = () => {
             name: 'Hours Efficiency Metric',
             explanation: 'How productive is the production team being?',
             target: '100%',
+            actual: '',
+            status: '',
+            actions: ''
+          },
+        ]
+      },
+      {
+        category: 'Financial',
+        kpis: [
+          {
+            name: 'Sales vs. Goal',
+            explanation: 'How well we are filling the backlog and getting new work approved',
+            target: '',
+            actual: '',
+            status: '',
+            actions: ''
+          },
+          {
+            name: 'Proposed vs. Goal',
+            explanation: '',
+            target: '',
             actual: '',
             status: '',
             actions: ''
@@ -388,7 +410,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Fleet',
             explanation: 'Review vehicle and equipment needs or issues',
-            target: '-',
+            target: '',
             actual: '',
             status: '',
             actions: ''
@@ -396,7 +418,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Equipment',
             explanation: '',
-            target: '-',
+            target: '',
             actual: '',
             status: '',
             actions: ''
@@ -404,7 +426,7 @@ const BranchManagerMeeting = () => {
           {
             name: 'Daily Safety Talks',
             explanation: '',
-            target: '-',
+            target: 'Daily',
             actual: '',
             status: '',
             actions: ''
@@ -548,10 +570,20 @@ const BranchManagerMeeting = () => {
   };
 
   const transformKPIData = (data) => {
+    // Build a lookup of KPI name -> correct category from meetingData
+    const kpiCategoryMap = {};
+    meetingData.metrics.forEach(metric => {
+      metric.kpis.forEach(kpi => {
+        if (kpi.name) kpiCategoryMap[kpi.name] = metric.category;
+      });
+    });
+
     const seen = new Set();
 
     const groupedData = data.reduce((acc, entry) => {
-      const key = `${entry.category}-${entry.kpi_name}`;
+      // Use the correct category from meetingData (handles renames like Financial -> Financial - Revenue)
+      const correctCategory = kpiCategoryMap[entry.kpi_name] || entry.category;
+      const key = `${correctCategory}-${entry.kpi_name}`;
 
       if (seen.has(key)) {
         return acc;
@@ -559,15 +591,15 @@ const BranchManagerMeeting = () => {
 
       seen.add(key);
 
-      if (!acc[entry.category]) {
-        acc[entry.category] = { category: entry.category, kpis: [] };
+      if (!acc[correctCategory]) {
+        acc[correctCategory] = { category: correctCategory, kpis: [] };
       }
 
-      const matchingMetric = meetingData.metrics.find(m => m.category === entry.category);
+      const matchingMetric = meetingData.metrics.find(m => m.category === correctCategory);
       const matchingKpi = matchingMetric?.kpis.find(k => k.name === entry.kpi_name);
       const explanation = matchingKpi?.explanation || entry.explanation || '';
 
-      acc[entry.category].kpis.push({
+      acc[correctCategory].kpis.push({
         name: entry.kpi_name,
         target: entry.target || '',
         actual: entry.actual || '',
@@ -578,11 +610,19 @@ const BranchManagerMeeting = () => {
       return acc;
     }, {});
 
+    // Preserve the KPI order defined in meetingData rather than sorting alphabetically
+    const kpiOrder = {};
+    meetingData.metrics.forEach(metric => {
+      metric.kpis.forEach((kpi, idx) => {
+        kpiOrder[`${metric.category}-${kpi.name}`] = idx;
+      });
+    });
+
     Object.values(groupedData).forEach(group => {
       group.kpis.sort((a, b) => {
-        const nameA = a.name || '';
-        const nameB = b.name || '';
-        return nameA.localeCompare(nameB);
+        const orderA = kpiOrder[`${group.category}-${a.name}`] ?? 999;
+        const orderB = kpiOrder[`${group.category}-${b.name}`] ?? 999;
+        return orderA - orderB;
       });
     });
 
@@ -683,7 +723,45 @@ const BranchManagerMeeting = () => {
 
             setMetricsData(transformKPIData(newData));
           } else {
-            setMetricsData(transformKPIData(data));
+            // Check for any new KPIs that don't exist in the DB yet
+            const existingKeys = new Set(data.map(d => `${d.category}-${d.kpi_name}`));
+            const missingEntries = meetingData.metrics.flatMap(metric =>
+              metric.kpis.filter(kpi => kpi.name && !existingKeys.has(`${metric.category}-${kpi.name}`)).map(kpi => {
+                let target = kpi.target;
+                if (kpi.name === 'OT %' && OT_TARGETS[selectedRegion]?.[selectedTab]) {
+                  target = OT_TARGETS[selectedRegion][selectedTab];
+                }
+                if (kpi.name === 'Hiring Needs' && HEADCOUNT_TARGETS[selectedRegion]?.[selectedTab]) {
+                  target = HEADCOUNT_TARGETS[selectedRegion][selectedTab];
+                }
+                return {
+                  meeting_type: MEETING_TYPE,
+                  department_id: selectedTab,
+                  region: selectedRegion,
+                  meeting_date: formattedDate,
+                  category: metric.category,
+                  kpi_name: kpi.name,
+                  target: target,
+                  explanation: kpi.explanation || '',
+                  actual: '',
+                  status: 'in-progress',
+                  actions: '',
+                  updated_at: new Date().toISOString()
+                };
+              })
+            );
+
+            if (missingEntries.length > 0) {
+              const { data: newRows, error: insertError } = await supabase
+                .from('kpi_entries')
+                .insert(missingEntries)
+                .select();
+
+              if (insertError) throw insertError;
+              setMetricsData(transformKPIData([...data, ...newRows]));
+            } else {
+              setMetricsData(transformKPIData(data));
+            }
           }
         } catch (err) {
           console.error('Error:', err);
@@ -739,7 +817,6 @@ const BranchManagerMeeting = () => {
         .eq('department_id', selectedTab)
         .eq('region', selectedRegion)
         .eq('meeting_date', formattedDate)
-        .eq('category', metric.category)
         .eq('kpi_name', kpi.name);
 
       if (error) {
@@ -748,6 +825,39 @@ const BranchManagerMeeting = () => {
       }
     } catch (err) {
       console.error('Error updating actual value:', err);
+      setError(err.message);
+    }
+  };
+
+  const handleTargetChange = async (mIndex, kIndex, newValue) => {
+    const metric = metricsData[mIndex];
+    const kpi = metric.kpis[kIndex];
+
+    setMetricsData(prev => updateKpiField(prev, mIndex, kIndex, 'target', newValue));
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const formattedDate = formatDateForDB(selectedDate);
+
+      const { error } = await supabase
+        .from('kpi_entries')
+        .update({
+          target: newValue,
+          updated_at: new Date().toISOString(),
+          updated_by: user?.id
+        })
+        .eq('meeting_type', MEETING_TYPE)
+        .eq('department_id', selectedTab)
+        .eq('region', selectedRegion)
+        .eq('meeting_date', formattedDate)
+        .eq('kpi_name', kpi.name);
+
+      if (error) {
+        console.error('Update error:', error);
+        throw error;
+      }
+    } catch (err) {
+      console.error('Error updating target value:', err);
       setError(err.message);
     }
   };
@@ -776,7 +886,6 @@ const BranchManagerMeeting = () => {
         .eq('department_id', selectedTab)
         .eq('region', selectedRegion)
         .eq('meeting_date', formatDateForDB(selectedDate))
-        .eq('category', metric.category)
         .eq('kpi_name', kpi.name);
 
       if (error) throw error;
@@ -802,7 +911,6 @@ const BranchManagerMeeting = () => {
           .eq('department_id', departmentId)
           .eq('region', region)
           .eq('meeting_date', formattedDate)
-          .eq('category', category)
           .eq('kpi_name', kpiName);
 
         if (error) {
@@ -981,7 +1089,9 @@ const BranchManagerMeeting = () => {
               <KPITable
                 loading={loading}
                 metricsData={metricsData}
+                departmentId={department.id}
                 handleActualChange={handleActualChange}
+                handleTargetChange={handleTargetChange}
                 handleStatusChange={handleStatusChange}
                 handleActionsChange={handleActionsChange}
               />
