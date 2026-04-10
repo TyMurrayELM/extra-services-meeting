@@ -214,13 +214,13 @@ const KPITable = ({
         <table className="w-full">
           <thead className="sticky top-0 z-10">
             <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-44">Category</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-52">KPI</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-36">Target</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-36">Actual</th>
-              <th className="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">Delta</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-44">Status</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions & Deadlines</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider w-44">Category</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider w-52">KPI</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider w-36">Target</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider w-36">Actual</th>
+              <th className="px-5 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider w-24">Delta</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider w-44">Status</th>
+              <th className="px-5 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">Actions & Deadlines</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -229,7 +229,7 @@ const KPITable = ({
                 <td colSpan="7" className="text-center py-12">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
-                    <span className="text-sm text-gray-500">Loading data...</span>
+                    <span className="text-sm text-black">Loading data...</span>
                   </div>
                 </td>
               </tr>
@@ -237,7 +237,7 @@ const KPITable = ({
               const config = CATEGORY_CONFIG[metric.category] || {
                 bg: 'bg-white',
                 border: 'border-l-gray-300',
-                badge: 'bg-gray-100 text-gray-600',
+                badge: 'bg-gray-100 text-black',
                 objective: '',
               };
 
@@ -267,7 +267,7 @@ const KPITable = ({
                         {metric.category}
                       </span>
                       {config.objective && (
-                        <p className="text-[11px] text-gray-400 mt-1.5 leading-snug pr-2">
+                        <p className="text-[11px] text-black mt-1.5 leading-snug pr-2">
                           {config.objective}
                         </p>
                       )}
@@ -276,13 +276,13 @@ const KPITable = ({
                     {/* KPI Name */}
                     <td className="px-5 py-3.5 align-top">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-medium text-gray-800">{kpi.name}</span>
+                        <span className="text-sm font-medium text-black">{kpi.name}</span>
                         {KPI_TOOLTIPS[kpi.name] && (
                           <InfoTooltip text={KPI_TOOLTIPS[kpi.name]} />
                         )}
                       </div>
                       {kpi.explanation && (
-                        <p className="text-[11px] text-gray-400 mt-1 leading-snug pr-2">
+                        <p className="text-[11px] text-black mt-1 leading-snug pr-2">
                           {kpi.explanation}
                         </p>
                       )}
@@ -292,26 +292,26 @@ const KPITable = ({
                     <td className="px-5 py-3.5 align-top">
                       {kpi.name === 'Proposal Targets and Deadlines being Met' ? (
                         <div>
-                          <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># Late</div>
-                          <span className="block text-sm font-medium text-gray-600 text-center">0</span>
+                          <div className="text-[10px] font-semibold text-black text-center mb-1"># Late</div>
+                          <span className="block text-sm font-medium text-black text-center">0</span>
                         </div>
                       ) : kpi.name === 'Follow up on Proposals' ? (
                         <div>
-                          <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># without Follow-up</div>
-                          <span className="block text-sm font-medium text-gray-600 text-center">0</span>
+                          <div className="text-[10px] font-semibold text-black text-center mb-1"># without Follow-up</div>
+                          <span className="block text-sm font-medium text-black text-center">0</span>
                         </div>
                       ) : kpi.name === 'Open Opportunities' ? (
                         <div>
-                          <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># over 60 days</div>
-                          <span className="block text-sm font-medium text-gray-600 text-center">0</span>
+                          <div className="text-[10px] font-semibold text-black text-center mb-1"># over 60 days</div>
+                          <span className="block text-sm font-medium text-black text-center">0</span>
                         </div>
                       ) : kpi.name === 'Fleet' || kpi.name === 'Equipment' ? (
                         <span></span>
                       ) : kpi.name === 'Daily Safety Talks' ? (
-                        <span className="text-sm font-medium text-gray-600">Daily</span>
+                        <span className="text-sm font-medium text-black">Daily</span>
                       ) : DOLLAR_KPIS.has(kpi.name) ? (
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-black text-sm">$</span>
                           <input
                             type="text"
                             value={formatWithCommas(kpi.target)}
@@ -332,8 +332,8 @@ const KPITable = ({
                               hover:border-black focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all"
                           />
                           {requiredFtes && (
-                            <div className="mt-1.5 text-[10px] text-gray-400 text-center leading-tight">
-                              <span className="font-medium">Req. FTEs:</span> <span className="font-semibold text-gray-600">{requiredFtes.target || '-'}</span>
+                            <div className="mt-1.5 text-[10px] text-black text-center leading-tight">
+                              <span className="font-medium">Req. FTEs:</span> <span className="font-semibold text-black">{requiredFtes.target || '-'}</span>
                             </div>
                           )}
                         </div>
@@ -357,7 +357,7 @@ const KPITable = ({
                         </select>
                       ) : DOLLAR_KPIS.has(kpi.name) ? (
                         <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-black text-sm">$</span>
                           <input
                             type="text"
                             value={formatWithCommas(kpi.actual)}
@@ -370,19 +370,19 @@ const KPITable = ({
                       ) : (
                         <div>
                           {kpi.name === 'Proposal Targets and Deadlines being Met' && (
-                            <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># Late</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1"># Late</div>
                           )}
                           {kpi.name === 'Follow up on Proposals' && (
-                            <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># without Follow-up</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1"># without Follow-up</div>
                           )}
                           {kpi.name === 'Open Opportunities' && (
-                            <div className="text-[10px] font-semibold text-gray-500 text-center mb-1"># over 60 days</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1"># over 60 days</div>
                           )}
                           {kpi.name === 'Fleet' && (
-                            <div className="text-[10px] font-semibold text-gray-500 text-center mb-1">Open Fleet Repair/Maintenance Service Requests</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1">Open Fleet Repair/Maintenance Service Requests</div>
                           )}
                           {kpi.name === 'Equipment' && (
-                            <div className="text-[10px] font-semibold text-gray-500 text-center mb-1">Open Equipment Repair/Maintenance Service Requests</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1">Open Equipment Repair/Maintenance Service Requests</div>
                           )}
                           <input
                             type="text"
@@ -393,8 +393,8 @@ const KPITable = ({
                               hover:border-black focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all"
                           />
                           {requiredFtes && (
-                            <div className="mt-1.5 text-[10px] text-gray-400 text-center leading-tight">
-                              <span className="font-medium">Req. FTEs:</span> <span className="font-semibold text-gray-600">{requiredFtes.actual || '-'}</span>
+                            <div className="mt-1.5 text-[10px] text-black text-center leading-tight">
+                              <span className="font-medium">Req. FTEs:</span> <span className="font-semibold text-black">{requiredFtes.actual || '-'}</span>
                             </div>
                           )}
                         </div>
@@ -425,12 +425,12 @@ const KPITable = ({
                         <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
                           delta.value > 0 ? 'bg-green-100 text-green-700' :
                           delta.value < 0 ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-600'
+                          'bg-gray-100 text-black'
                         }`}>
                           {delta.formatted}
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-300">-</span>
+                        <span className="text-xs text-black">-</span>
                       )}
                       {kpi.name === 'Backlog' && delta && delta.value > 0 && (
                         <div className="mt-1 text-[10px] font-semibold text-red-600">Understaffed</div>
@@ -440,9 +440,9 @@ const KPITable = ({
                         if (!projection) return null;
                         return (
                           <>
-                            <div className="mt-1.5 text-[10px] text-gray-500 leading-tight">
-                              <span className="font-medium text-gray-400">Proj:</span>{' '}
-                              <span className="font-semibold text-gray-600">{projection.formatted}</span>
+                            <div className="mt-1.5 text-[10px] text-black leading-tight">
+                              <span className="font-medium text-black">Proj:</span>{' '}
+                              <span className="font-semibold text-black">{projection.formatted}</span>
                             </div>
                             {projection.gap && (
                               <div className={`mt-0.5 text-[10px] font-semibold leading-tight ${
