@@ -409,7 +409,7 @@ const BranchManagerMeeting = () => {
           },
           {
             name: 'Fleet',
-            explanation: 'Review vehicle and equipment needs or issues',
+            explanation: 'Review vehicle specific needs or issues',
             target: '',
             actual: '',
             status: '',
@@ -1090,6 +1090,8 @@ const BranchManagerMeeting = () => {
                 loading={loading}
                 metricsData={metricsData}
                 departmentId={department.id}
+                selectedRegion={selectedRegion}
+                selectedDate={selectedDate}
                 handleActualChange={handleActualChange}
                 handleTargetChange={handleTargetChange}
                 handleStatusChange={handleStatusChange}

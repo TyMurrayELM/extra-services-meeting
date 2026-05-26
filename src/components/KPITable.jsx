@@ -56,15 +56,97 @@ const CATEGORY_CONFIG = {
   },
 };
 
-const KPI_LINKS = {
-  'Revenue vs. Goal': 'https://lookerstudio.google.com/u/0/reporting/2a7279f7-4e0a-4a51-a24a-1fe66fa70ae3/page/p_8id7wsettc?params=%7B%22df368%22:%22ORexclude%25EE%2580%25800%25EE%2580%2580IN%25EE%2580%2580Maint%25EE%2580%2580Maint%2520Onsite%25EE%2580%2581include%25EE%2580%25803%25EE%2580%2580NU%25EE%2580%2582%22%7D',
-  'Sales vs. Goal': 'https://lookerstudio.google.com/u/0/reporting/2a7279f7-4e0a-4a51-a24a-1fe66fa70ae3/page/p_uybn8k00sc',
-  'Proposed vs. Goal': 'https://lookerstudio.google.com/u/0/reporting/2a7279f7-4e0a-4a51-a24a-1fe66fa70ae3/page/p_uybn8k00sc',
-  'Gross Margin': 'https://manage.encorelm.com/crm/opportunities?job_status_name=Complete',
-  'Backlog': 'https://manage.encorelm.com/crm/opportunities?opportunity_status_name=Won&job_status_name=In+Production',
-  'Open Opportunities': 'https://manage.encorelm.com/crm/opportunities?opportunity_status_name=Won&job_status_name=In+Production',
-  'Fleet': 'https://manage.encorelm.com/service_requests',
-  'Equipment': 'https://manage.encorelm.com/service_requests',
+const KPI_LINKS = {};
+
+const REGION_PARAM = { phoenix: 'Phoenix', lasvegas: 'Las Vegas' };
+const DIVISION_PARAM = { spray: 'Spray', arbor: 'Arbor', enhancements: 'Enhancements' };
+
+const buildRevenueScorecardUrl = ({ region, departmentId, date }) => {
+  const d = date ? new Date(date) : new Date();
+  const params = new URLSearchParams();
+  params.append('region', REGION_PARAM[region] || region);
+  params.append('divisions[]', DIVISION_PARAM[departmentId] || departmentId);
+  params.append('months[]', String(d.getMonth() + 1));
+  params.append('year', String(d.getFullYear()));
+  return `https://manage.encorelm.com/crm/revenue_scorecards?${params.toString()}`;
+};
+
+const formatYMD = (d) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+const buildCompletedOpportunitiesUrl = ({ region, departmentId, date }) => {
+  const d = date ? new Date(date) : new Date();
+  const firstOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+  const lastOfMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  const params = new URLSearchParams();
+  params.append('region', REGION_PARAM[region] || region);
+  params.append('division_name', DIVISION_PARAM[departmentId] || departmentId);
+  params.append('job_status_name', 'Complete');
+  params.append('date_from', formatYMD(firstOfMonth));
+  params.append('date_to', formatYMD(lastOfMonth));
+  return `https://manage.encorelm.com/crm/opportunities?${params.toString()}`;
+};
+
+const buildBacklogUrl = ({ region, departmentId }) => {
+  const params = new URLSearchParams();
+  params.append('division_name', DIVISION_PARAM[departmentId] || departmentId);
+  params.append('job_status_name', 'In Production');
+  params.append('opportunity_status_name', 'Won');
+  params.append('region', REGION_PARAM[region] || region);
+  return `https://manage.encorelm.com/crm/opportunities?${params.toString()}`;
+};
+
+const buildServiceRequestsUrl = ({ region, departmentId, assetType }) => {
+  const params = new URLSearchParams();
+  params.append('search', '');
+  params.append('region', REGION_PARAM[region] || region);
+  params.append('department', DIVISION_PARAM[departmentId] || departmentId);
+  if (assetType) params.append('asset_type', assetType);
+  ['acknowledged', 'in_progress', 'submitted', 'waiting_parts'].forEach((s) => {
+    params.append('status[]', s);
+  });
+  return `https://manage.encorelm.com/service_requests?${params.toString()}`;
+};
+
+const buildFleetServiceRequestsUrl = (ctx) => buildServiceRequestsUrl({ ...ctx, assetType: 'vehicle' });
+const buildEquipmentServiceRequestsUrl = (ctx) => buildServiceRequestsUrl(ctx);
+
+const buildOpenOpportunitiesUrl = ({ region, departmentId }) => {
+  const params = new URLSearchParams();
+  params.append('division_name', DIVISION_PARAM[departmentId] || departmentId);
+  params.append('job_status_name', 'In Production');
+  params.append('min_days_aged', '60');
+  params.append('opportunity_status_name', 'Won');
+  params.append('region', REGION_PARAM[region] || region);
+  return `https://manage.encorelm.com/crm/opportunities?${params.toString()}`;
+};
+
+const buildExtraServicesScorecardUrl = ({ region, departmentId, date }) => {
+  const d = date ? new Date(date) : new Date();
+  const params = new URLSearchParams();
+  params.append('region', REGION_PARAM[region] || region);
+  params.append('branch', '');
+  params.append('divisions[]', DIVISION_PARAM[departmentId] || departmentId);
+  params.append('months[]', String(d.getMonth() + 1));
+  params.append('sales_rep', '');
+  params.append('year', String(d.getFullYear()));
+  return `https://manage.encorelm.com/extra_services_scorecards?${params.toString()}`;
+};
+
+const KPI_DYNAMIC_LINKS = {
+  'Revenue vs. Goal': buildRevenueScorecardUrl,
+  'Required FTEs to Hit Goal': buildRevenueScorecardUrl,
+  'Sales vs. Goal': buildExtraServicesScorecardUrl,
+  'Proposed vs. Goal': buildExtraServicesScorecardUrl,
+  'Gross Margin': buildCompletedOpportunitiesUrl,
+  'Backlog': buildBacklogUrl,
+  'Open Opportunities': buildOpenOpportunitiesUrl,
+  'Fleet': buildFleetServiceRequestsUrl,
+  'Equipment': buildEquipmentServiceRequestsUrl,
 };
 
 // KPIs with department-specific links
@@ -195,6 +277,8 @@ const KPITable = ({
   loading,
   metricsData,
   departmentId,
+  selectedRegion,
+  selectedDate,
   handleActualChange,
   handleStatusChange,
   handleActionsChange,
@@ -246,8 +330,12 @@ const KPITable = ({
                 const StatusIcon = statusCfg?.icon;
                 const delta = computeDelta(kpi.target, kpi.actual, kpi.name);
 
-                // Resolve link: static or department-specific
-                const kpiLink = KPI_LINKS[kpi.name] || KPI_DEPT_LINKS[kpi.name]?.[departmentId] || null;
+                // Resolve link: dynamic builder, static map, or department-specific
+                const kpiLink =
+                  KPI_DYNAMIC_LINKS[kpi.name]?.({ region: selectedRegion, departmentId, date: selectedDate }) ||
+                  KPI_LINKS[kpi.name] ||
+                  KPI_DEPT_LINKS[kpi.name]?.[departmentId] ||
+                  null;
                 const isSlackKpi = SLACK_KPIS.has(kpi.name);
                 const hasIcon = kpiLink || isSlackKpi;
 
@@ -379,7 +467,7 @@ const KPITable = ({
                             <div className="text-[10px] font-semibold text-black text-center mb-1"># over 60 days</div>
                           )}
                           {kpi.name === 'Fleet' && (
-                            <div className="text-[10px] font-semibold text-black text-center mb-1">Open Fleet Repair/Maintenance Service Requests</div>
+                            <div className="text-[10px] font-semibold text-black text-center mb-1">Open Vehicle Repair/Maintenance Service Requests</div>
                           )}
                           {kpi.name === 'Equipment' && (
                             <div className="text-[10px] font-semibold text-black text-center mb-1">Open Equipment Repair/Maintenance Service Requests</div>
