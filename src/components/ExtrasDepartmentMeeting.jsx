@@ -408,7 +408,7 @@ const BranchManagerMeeting = () => {
             actions: ''
           },
           {
-            name: 'Fleet',
+            name: 'Vehicles',
             explanation: 'Review vehicle specific needs or issues',
             target: '',
             actual: '',

@@ -112,7 +112,7 @@ const buildServiceRequestsUrl = ({ region, departmentId, assetType }) => {
   return `https://manage.encorelm.com/service_requests?${params.toString()}`;
 };
 
-const buildFleetServiceRequestsUrl = (ctx) => buildServiceRequestsUrl({ ...ctx, assetType: 'vehicle' });
+const buildVehiclesServiceRequestsUrl = (ctx) => buildServiceRequestsUrl({ ...ctx, assetType: 'vehicle' });
 const buildEquipmentServiceRequestsUrl = (ctx) => buildServiceRequestsUrl(ctx);
 
 const buildOpenOpportunitiesUrl = ({ region, departmentId }) => {
@@ -145,7 +145,7 @@ const KPI_DYNAMIC_LINKS = {
   'Gross Margin': buildCompletedOpportunitiesUrl,
   'Backlog': buildBacklogUrl,
   'Open Opportunities': buildOpenOpportunitiesUrl,
-  'Fleet': buildFleetServiceRequestsUrl,
+  'Vehicles': buildVehiclesServiceRequestsUrl,
   'Equipment': buildEquipmentServiceRequestsUrl,
 };
 
@@ -393,7 +393,7 @@ const KPITable = ({
                           <div className="text-[10px] font-semibold text-black text-center mb-1"># over 60 days</div>
                           <span className="block text-sm font-medium text-black text-center">0</span>
                         </div>
-                      ) : kpi.name === 'Fleet' || kpi.name === 'Equipment' ? (
+                      ) : kpi.name === 'Vehicles' || kpi.name === 'Equipment' ? (
                         <span></span>
                       ) : kpi.name === 'Daily Safety Talks' ? (
                         <span className="text-sm font-medium text-black">Daily</span>
@@ -466,7 +466,7 @@ const KPITable = ({
                           {kpi.name === 'Open Opportunities' && (
                             <div className="text-[10px] font-semibold text-black text-center mb-1"># over 60 days</div>
                           )}
-                          {kpi.name === 'Fleet' && (
+                          {kpi.name === 'Vehicles' && (
                             <div className="text-[10px] font-semibold text-black text-center mb-1">Open Vehicle Repair/Maintenance Service Requests</div>
                           )}
                           {kpi.name === 'Equipment' && (
