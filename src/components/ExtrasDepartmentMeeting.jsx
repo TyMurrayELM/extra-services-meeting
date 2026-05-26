@@ -417,7 +417,7 @@ const BranchManagerMeeting = () => {
           },
           {
             name: 'Equipment',
-            explanation: '',
+            explanation: 'Review equipment specific needs or issues',
             target: '',
             actual: '',
             status: '',
